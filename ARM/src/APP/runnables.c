@@ -19,6 +19,7 @@
 
 #include "app/runnables.h"
 
+
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
@@ -114,4 +115,17 @@ void Runnable_LED_StateMachine(void)
         break;
     }
     //if (counter == (YELLOW_PERIOD_MS+RED_PERIOD_MS+GREEN_PERIOD_MS)) counter = 0;
+}
+void LCD_Test()
+{
+    static uint32 counts=0;
+    counts++;
+    if (counts == 1)
+    {
+        LCD_writeStringAsync("Eid Mobark",10);
+    }
+    else if (counts == 5)
+    {
+        LCD_clearScreenAsynch();
+    }
 }

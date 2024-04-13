@@ -2,67 +2,45 @@
 *
 * Module: 
 *
-* File Name: lcd.h
+* File Name: uart_cfg.h
 *
 
 * Description: 
 *
 * Author: Safia Hany
 * 
-* Date:  1/4/2024
+* Date:  13/4/2024
 ******************************************************************************/
-#ifndef HAL_LCD_H_
-#define HAL_LCD_H_
+#ifndef UART_CFG_H
+#define UART_CFG_H
+
 
 
 /********************************************************************************************************/
 /************************************************Includes************************************************/
 /********************************************************************************************************/
-#include "Std_Types.h"
-#include "mcal/gpio.h"
-#include "hal/lcd_cfg.h"
+#include "mcal/uart.h"
 
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
 
+#define UART_MODE_RX                        ((uint32)UART_RX_ENABLE)
+#define UART_MODE_TX                        ((uint32)UART_TX_ENABLE)
+#define UART_MODE_TX_RX                     ((uint32)(UART_TX_ENABLE |UART_RX_ENABLE))
 
+#define UART_OVERSAMPLING_16                ((uint32)0x00000000)
+#define UART_OVERSAMPLING_8                 ((uint32)0X00008000)
 
+#define USART2 1
+#define USART6 2
 /********************************************************************************************************/
 /************************************************Types***************************************************/
 /********************************************************************************************************/
-typedef struct
+
+typedef enum
 {
-    /* data */
-    void* port;
-    GPIO_PinType pin;
-}LCD_Pin_t;
-
-typedef struct
-{
-    /* data */
-    LCD_Pin_t Data_Pins[8];
-    LCD_Pin_t RS_Pin;
-    LCD_Pin_t RW_Pin;
-    LCD_Pin_t E_Pin;
-}LCD_Conn_t;
-
-
-
-/********************************************************************************************************/
-/************************************************APIs****************************************************/
-/********************************************************************************************************/
-
-
-void LCD_writeStringAsync(const uint8* string,uint8 length);
-
-void LCD_setCursorPosAsync(uint8 posX, uint8 posY);
-
-void LCD_clearScreenAsynch(void);
-
-uint8 LCD_getStatus(void);
-
-void LCD_initAsync();
-
-
-#endif // HAL_LCD_H_
+    USART1,
+    _UART_USED_NUM
+} uart_used;
+#endif // UART_CFG_H

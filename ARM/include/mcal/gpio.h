@@ -94,10 +94,10 @@ typedef enum
 
 
 
+
 GPIO_ERROR_t GPIO_init(GPIO_ConfigPin_t *Config_ptr);
 
 GPIO_ERROR_t GPIO_setPinValue(void* port,uint32 pin, uint32 value);
 
 uint32 GPIO_getPinValue(void* port,uint32 pin);
-
 #endif /* MCAL_GPIO_GPIO_H_ */

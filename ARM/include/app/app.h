@@ -26,6 +26,7 @@
 #include "hal/led.h"
 #include "mcal/systick.h"
 #include "services/sched.h"
+#include "hal/lcd.h"
 
 
 /********************************************************************************************************/
@@ -50,5 +51,6 @@ enum MyIRQs_e
 void app1();
 void app2();
 void app3();
+void app4();
 
 #endif // C__USERS_MS_STORE_DOCUMENTS_PLATFORMIO_PROJECTS_ARM_INCLUDE_APP_APP_H_

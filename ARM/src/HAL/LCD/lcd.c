@@ -22,19 +22,24 @@
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
 
-#define LCD_NUM_DATA_PINS       LCD_BIT_MODE 
-#define LCD_TOTAL_PINS          (LCD_BIT_MODE + 3)
-#define MAX_NUM_REQ             3
+#define LCD_NUM_DATA_PINS       8 
+#define LCD_TOTAL_PINS          (LCD_NUM_DATA_PINS + 3)
 
 #define CURSOR_HOME_LINE               0
 #define CURSOR_HOME_COL                0
 
-#define LCD_CURSOR_ON                  1
-#define LCD_CLEAR_COMMAND              0
-#define LCD_SHIFT_RIGHT_CRUSOR         0
+#define LCD_CURSOR_ON                  0x0E
+#define LCD_CURSOR_OFF                 0x0C
+#define LCD_CLEAR_COMMAND              0x01
+#define LCD_SHIFT_RIGHT_CRUSOR         0x06
 
 #define ENABLE_PIN_LOW                  0
 #define ENABLE_PIN_HIGH                 1
+
+#define LCD_LINE0                       0
+#define LCD_LINE1                       1
+#define LCD_LINE2                       2
+#define LCD_LINE3                       3
 /********************************************************************************************************/
 /************************************************Types***************************************************/
 /********************************************************************************************************/
@@ -44,6 +49,7 @@ typedef enum{
 }Userstate_t;
 
 typedef enum{
+    NO_REQ,
     WRITE_REQ,
     CLEAR_REQ,
     SET_POS_REQ
@@ -80,16 +86,12 @@ typedef struct
     CursorPose_t currentPose;
 }User_Request_t;
 
-
-
-
-
 /********************************************************************************************************/
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
 
 extern const LCD_Conn_t LCD_Config;
-User_Request_t User_Req[MAX_NUM_REQ];
+User_Request_t User_Req;
 uint8 g_useCurr_req = 0;
 static LCD_Mode_t g_LCD_initMode = POWER_ON_MODE;
 static LCD_State_t g_LCD_State = LCD_OFF;
@@ -99,24 +101,27 @@ static uint8 g_LCD_enablePin = ENABLE_PIN_LOW;
 /*****************************************Static Functions Prototype*************************************/
 /********************************************************************************************************/
 
+static void LCD_Init(void);
 static void LCD_initSM();
 static void LCD_writeProcess();
 static void LCD_clearProcess();
 static void LCD_setPose_Process();
+static void LCD_WriteCommand(uint8 command);
 
 
 /********************************************************************************************************/
 /*********************************************APIs Implementation****************************************/
 /********************************************************************************************************/
 
-void LCD_Init(void)
+static void LCD_Init(void)
 {
+    User_Req.state = USER_STATE_BUSY;
     //Configure LCD Pins
     GPIO_ConfigPin_t LCD_Pin;
     LCD_Pin.Mode = GPIO_MODE_OUT_PP;
     LCD_Pin.Speed = GPIO_MEDUIM_SPEED;
     //Configure Data Pins as Output
-    for (uint8 idx ; idx < LCD_NUM_DATA_PINS; idx++)
+    for (uint8 idx=0 ; idx < LCD_NUM_DATA_PINS; idx++)
     {
         LCD_Pin.Port = LCD_Config.Data_Pins[idx].port;
         LCD_Pin.Pin = LCD_Config.Data_Pins[idx].pin;
@@ -135,8 +140,8 @@ void LCD_Init(void)
     LCD_Pin.Pin = LCD_Config.E_Pin.pin;
     GPIO_init(&LCD_Pin);
     //Assign the cursor position to 1st pos
-    User_Req[g_useCurr_req].currentPose.linePos = CURSOR_HOME_LINE;
-    User_Req[g_useCurr_req].currentPose.colPos =CURSOR_HOME_COL;
+    User_Req.currentPose.linePos = CURSOR_HOME_LINE;
+    User_Req.currentPose.colPos =CURSOR_HOME_COL;
 
 }
 
@@ -148,9 +153,9 @@ void LCD_Runnable()
     }
     else if (g_LCD_State == LCD_OPERATIONAL)
     {
-        if (User_Req[g_useCurr_req].state = USER_STATE_BUSY)
+        if (User_Req.state == USER_STATE_BUSY)
         {
-            switch (User_Req[g_useCurr_req].type)
+            switch (User_Req.type)
             {
             case WRITE_REQ:
                 LCD_writeProcess();
@@ -159,7 +164,7 @@ void LCD_Runnable()
                 LCD_clearProcess();
                 break;  
             case SET_POS_REQ:
-                LCD_clearProcess();
+                LCD_setPose_Process();
                 break;                         
             default:
                 break;
@@ -178,83 +183,168 @@ static void LCD_initSM()
         LCD_Init();
         g_LCD_initMode = FUNC_SET_MODE;
         break;
-    
     case FUNC_SET_MODE:
         LCD_WriteCommand(LCD_BIT_MODE);
         //Check that the configuration is completed 
-        if (g_LCD_enablePin = ENABLE_PIN_LOW) g_LCD_initMode = DISPLAY_MODE;
+        if (g_LCD_enablePin == ENABLE_PIN_LOW) g_LCD_initMode = DISPLAY_MODE;
         break;
     case DISPLAY_MODE:
         LCD_WriteCommand(LCD_CURSOR_ON);
-        if (g_LCD_enablePin = ENABLE_PIN_LOW) g_LCD_initMode = CLEAR_MODE;
+        if (g_LCD_enablePin == ENABLE_PIN_LOW) g_LCD_initMode = CLEAR_MODE;
     case CLEAR_MODE:
         LCD_WriteCommand(LCD_CLEAR_COMMAND);
-        if (g_LCD_enablePin = ENABLE_PIN_LOW) g_LCD_initMode = ENTRY_MODE;
+        if (g_LCD_enablePin == ENABLE_PIN_LOW) g_LCD_initMode = ENTRY_MODE;
         break;
+    /* FIXME */
     case ENTRY_MODE:
         LCD_WriteCommand(LCD_SHIFT_RIGHT_CRUSOR);
-        g_LCD_initMode = END_MODE;
+        if (g_LCD_enablePin == ENABLE_PIN_LOW) g_LCD_initMode = END_MODE;
         break;  
     case END_MODE:
         //Configuration Done, LCD can handle the req.
-        User_Req[g_useCurr_req].state = USER_STATE_READY;
+        User_Req.state = USER_STATE_READY;
         g_LCD_State = LCD_OPERATIONAL;
-        break;
-              
+        break;          
     default:
         break;
     }
 }
 
 
-
-void LCD_writeStringAsync(uint8* string,uint8 length){
-
-    for(uint8 idx; idx< MAX_NUM_REQ;idx++)
-    {
-        if (User_Req[idx].state== USER_STATE_READY )
-        {
-            User_Req[idx].state= USER_STATE_BUSY ;
-            User_Req[idx].name = string;
-            User_Req[idx].len = length;
-            User_Req[idx].type = WRITE_REQ;
-        }
-    }
-
-
-}
-
 static void LCD_WriteCommand(uint8 command)
 {
+    uint8 idx;
+    uint8 pinValue;
     if (g_LCD_enablePin == ENABLE_PIN_LOW)
     {
-        GPIO_setPinValue(LCD_Config.RW_Pin.port,LCD_Config.RW_Pin.pin,GPIO_RESET_PIN);
-        GPIO_setPinValue(LCD_Config.RS_Pin.port,LCD_Config.RS_Pin.pin,GPIO_RESET_PIN);
+        GPIO_setPinValue(LCD_Config.RW_Pin.port,LCD_Config.RW_Pin.pin,LOGIC_LOW);
+        GPIO_setPinValue(LCD_Config.RS_Pin.port,LCD_Config.RS_Pin.pin,LOGIC_LOW);
+        GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_HIGH);
         //for loop
-        GPIO_setPinValue(LCD_Config.RW_Pin.port,LCD_Config.RW_Pin.pin,GPIO_SET_PIN);
+        for (idx = 0; idx < LCD_NUM_DATA_PINS ;idx++)
+        {
+            //Get the value of each bit
+            pinValue = ((command >> idx) & 1) ;
+            GPIO_setPinValue(LCD_Config.Data_Pins[idx].port,LCD_Config.Data_Pins[idx].pin,pinValue);
+        }
+        GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
     }
-
+    else 
+    {
+        GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
+    }
 }
+
+/**
+ * @brief Writes data to the LCD.
+ *
+ * This function writes the given data to the LCD module. It sets the appropriate control signals
+ * and data pins to send the data to the LCD.
+ *
+ * @param data The data to be written to the LCD.
+ */
+static void LCD_WriteData(uint8 data)
+{
+    uint8 idx;
+    uint8 pinValue;
+    if (g_LCD_enablePin == ENABLE_PIN_LOW)
+    {
+    GPIO_setPinValue(LCD_Config.RW_Pin.port,LCD_Config.RW_Pin.pin,LOGIC_LOW);
+    GPIO_setPinValue(LCD_Config.RS_Pin.port,LCD_Config.RS_Pin.pin,LOGIC_HIGH);
+    GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_HIGH);
+    //for loop
+    for (idx = 0; idx < LCD_NUM_DATA_PINS ;idx++)
+    {
+        //Get the value of each bit
+        pinValue = ((data >> idx) & 1) ;
+        GPIO_setPinValue(LCD_Config.Data_Pins[idx].port,LCD_Config.Data_Pins[idx].pin,pinValue);
+    }
+    GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
+    }
+    else
+    {
+        GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
+    }
+}
+void LCD_initAsync()
+{
+    g_LCD_State = LCD_INIT;
+}
+void LCD_writeStringAsync(const uint8* string,uint8 length){
+
+    if (User_Req.state== USER_STATE_READY && g_LCD_State == LCD_OPERATIONAL)
+    {
+        User_Req.state= USER_STATE_BUSY ;
+        User_Req.name = string;
+        User_Req.len = length;
+        User_Req.type = WRITE_REQ;
+    }
+}
+
 void LCD_setCursorPosAsync(uint8 posX, uint8 posY){
 
+    if ((User_Req.state == USER_STATE_READY) && (g_LCD_State == LCD_OPERATIONAL))
+    {
+        User_Req.state = USER_STATE_BUSY ;
+        User_Req.type = SET_POS_REQ;
+        User_Req.currentPose.linePos = posX;
+        User_Req.currentPose.colPos = posY;
+    }
 }
 
 void LCD_clearScreenAsynch(void){
-
+        if (User_Req.state== USER_STATE_READY )
+    {
+        User_Req.state= USER_STATE_BUSY ;
+        User_Req.type = CLEAR_REQ;
+    }  
 }
 
 uint8 LCD_getStatus(void){
-
+    return g_LCD_State;
 }
-
-
 
 static void LCD_writeProcess(){
 
+    for (uint8 idx=0; idx<User_Req.len;idx++)
+    {
+        LCD_WriteData(User_Req.name[idx]);
+    }
+    User_Req.state = USER_STATE_READY;
+    User_Req.type = NO_REQ;
 }
 static void LCD_clearProcess(){
-
+    LCD_WriteCommand(LCD_CLEAR_COMMAND);
+    if (g_LCD_enablePin == ENABLE_PIN_LOW)
+    {
+        User_Req.state = USER_STATE_READY;
+        User_Req.type = NO_REQ;
+    }
 }
 static void LCD_setPose_Process(){
+    uint8 lcd_memory_address = 0;
 
+    switch (User_Req.currentPose.linePos)
+    {
+    case LCD_LINE0:
+        lcd_memory_address = User_Req.currentPose.colPos;
+        break;  
+    case LCD_LINE1:
+        lcd_memory_address =  User_Req.currentPose.colPos + 0x40;
+        break;
+    case LCD_LINE2:
+        lcd_memory_address =  User_Req.currentPose.colPos + 0x10;
+        break;
+    case LCD_LINE3:
+        lcd_memory_address =  User_Req.currentPose.colPos + 0x50;
+        break;
+    default:
+        break;
+    }
+    LCD_WriteCommand(lcd_memory_address + LCD_SET_CURSOR_LOCATION);
+    if (g_LCD_enablePin == ENABLE_PIN_LOW)
+    {
+        User_Req.state = USER_STATE_READY;
+        User_Req.type = NO_REQ;
+    }
 }

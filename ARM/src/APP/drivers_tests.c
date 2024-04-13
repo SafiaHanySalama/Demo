@@ -92,3 +92,10 @@ void app3()
   sched_init();
   sched_start();
 }
+void app4()
+{
+  set_preipheral_clk(GPIOB);
+  LCD_initAsync();
+  sched_init();
+  sched_start();
+}

@@ -15,7 +15,7 @@
 
 #include "Std_Types.h"
 
-#define TICK_TIME		100
+#define TICK_TIME		1
 
 typedef void (*runnablecb_t) (void);
 typedef struct{

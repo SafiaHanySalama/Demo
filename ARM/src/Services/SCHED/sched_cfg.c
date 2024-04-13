@@ -13,9 +13,10 @@
 #include "services/sched.h"
 #include "services/sched_cfg.h"
 
+
 const runnable_t runnable_list[_num_runnable]=
 {
-		[LED_StateMachine] = {.name = "traffic light state machine",
+/* 		[LED_StateMachine] = {.name = "traffic light state machine",
 		.periodicity_ms = 100,
 		.cb = Runnable_LED_StateMachine,
 		.delayms = 0
@@ -30,5 +31,18 @@ const runnable_t runnable_list[_num_runnable]=
 				.periodicity_ms = 1100,
 				.cb = Runnable_LED_SW,
 				.delayms = 50
+		} */
+		[LCD] = {
+			.name = "LCD",
+			.periodicity_ms = 2,
+			.cb = LCD_Runnable,
+			.delayms =0
+		},
+		[LCDTest] = {
+			.name = "LCDTest",
+			.periodicity_ms = 1000,
+			.cb = LCD_Test,
+			.delayms =20
 		}
+		
 };

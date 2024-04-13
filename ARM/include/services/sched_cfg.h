@@ -16,15 +16,18 @@
 
 typedef enum
 {
-  LED_StateMachine,
-  LED_Toggle,
-  LED_SW,
+  //LED_StateMachine,
+  //LED_Toggle,
+  //LED_SW,
+  LCD,
+  LCDTest,
   _num_runnable
 }Run_t;
 
 extern void Runnable_LED_Toggle(void);
 extern void Runnable_LED_SW(void);
 extern void Runnable_LED_StateMachine(void);
-
+extern void LCD_Runnable(void);
+extern void LCD_Test(void);
 
 #endif /* INCLUDE_SERVICES_RUNNABLE_H_ */

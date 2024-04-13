@@ -25,7 +25,17 @@
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
 
-#define LCD_BIT_MODE            8
+
+
+#define LCD_CLEAR_COMMAND              0x01
+#define LCD_GO_TO_HOME                 0x02
+#define LCD_TWO_LINES_EIGHT_BITS_MODE  0x38
+#define LCD_TWO_LINES_FOUR_BITS_MODE   0x28
+#define LCD_CURSOR_OFF                 0x0C
+#define LCD_CURSOR_ON                  0x0E
+#define LCD_SET_CURSOR_LOCATION        0x80
+
+#define LCD_BIT_MODE            LCD_TWO_LINES_EIGHT_BITS_MODE
 
 /********************************************************************************************************/
 /************************************************Types***************************************************/
