@@ -203,10 +203,10 @@ void USART_TxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq)
         TxReq.status = USART_BUSY;
     }
     
-     ((uart_t *)uart)->USART_CR1 |= UART_TX_ENABLE;
+    ((uart_t *)uart)->USART_CR1 |= UART_TX_ENABLE;
     ((uart_t *)uart)->USART_DR = TxReq.buffer.data[0];
     TxReq.buffer.index++;
-     ((uart_t *)uart)->USART_CR1 |= UART_TXE_FLAG;
+    ((uart_t *)uart)->USART_CR1 |= UART_TXE_FLAG;
 }
 
 /**
@@ -244,11 +244,10 @@ void UART_sendByte(UART_UserReq_t *Ptr_UserReq)
     volatile uart_t *uart = (uart_t *)uart_base_address[usart_config[Ptr_UserReq->usartID].uartid];
     if (TxReq.status == USART_READY)
     {
-        uint32 timeout = 5000;
+       volatile uint32 timeout = 5000;
         TxReq.status = USART_BUSY;
-        //uart->USART_DR = *Ptr_UserReq->ptr_buffer;
-        ((uart_t *)uart)->USART_DR = *(Ptr_UserReq->ptr_buffer);
         ((uart_t *)uart)->USART_CR1 |= UART_TX_ENABLE;
+        ((uart_t *)uart)->USART_DR = *(Ptr_UserReq->ptr_buffer);
         while ((((((uart_t *)uart)->USART_SR) & UART_TC_FLAG)==0) && timeout)
         {
             timeout--;
@@ -258,6 +257,7 @@ void UART_sendByte(UART_UserReq_t *Ptr_UserReq)
             //debugging
         }
         TxReq.status = USART_READY;
+
     }
 
 }

@@ -349,3 +349,14 @@ static void LCD_setPose_Process(){
         User_Req.type = NO_REQ;
     }
 }
+
+#define LCD_DISPLAYCONTROL 0x08
+#define LCD_BLINKON 0x01
+
+void LCD_blinkOn() {
+    LCD_WriteCommand(LCD_DISPLAYCONTROL | LCD_BLINKON);
+}
+
+void LCD_blinkOff() {
+    LCD_WriteCommand(LCD_DISPLAYCONTROL & ~LCD_BLINKON);
+}

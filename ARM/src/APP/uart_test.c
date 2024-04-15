@@ -86,10 +86,11 @@ void uart_test()
     //uint32 priority = NVIC_EncodePriority(PRIGROUP_1,0,0);
     //NVIC_SetPriority(USART1_IRQn,priority);
     NVIC_EnableIRQ(USART1_IRQn);
-    GPIO_init(&uart_pins_config[0]);
-    GPIO_init(&uart_pins_config[1]);
+
     GPIO_CFG_AlternativeFunction(uart_pins_config[0].Port,uart_pins_config[0].Pin,GPIO_AF_7);
     GPIO_CFG_AlternativeFunction(uart_pins_config[1].Port,uart_pins_config[1].Pin,GPIO_AF_7);
+    GPIO_init(&uart_pins_config[0]);
+    GPIO_init(&uart_pins_config[1]);
     UART_init();
     UART_sendByte(&uart_req1);
     USART_TxBufferAsyncZeroCopy(&uart_req2);
