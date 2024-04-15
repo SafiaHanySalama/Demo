@@ -36,9 +36,6 @@
 #define UART5_IDX 3
 
 
-#define USART2 1
-#define USART6 2
-#define UART5 3
 
 #define UART_NUM_IN_TARGET 4
 
@@ -108,5 +105,14 @@ typedef struct
 /********************************************************************************************************/
 /************************************************APIs****************************************************/
 /********************************************************************************************************/
+
+void UART_init(void);
+void USART_TxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq);
+void USART_RxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq);
+void UART_sendByte(UART_UserReq_t *Ptr_UserReq);
+void UART_receiveByte(UART_UserReq_t *Ptr_UserReq);
+void USART1_IRQHandler(void);
+void USART2_IRQHandler(void);
+void USART6_IRQHandler(void);
 
 #endif // UART_H

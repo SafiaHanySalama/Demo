@@ -2,33 +2,23 @@
 *
 * Module: 
 *
-* File Name: filename
+* File Name: husart.h
 *
 
 * Description: 
 *
 * Author: Safia Hany
 * 
-* Date:  time
+* Date:  13/4/2024
 ******************************************************************************/
-
-
-
-#ifndef C__USERS_MS_STORE_DOCUMENTS_PLATFORMIO_PROJECTS_ARM_INCLUDE_APP_APP_H_
-#define C__USERS_MS_STORE_DOCUMENTS_PLATFORMIO_PROJECTS_ARM_INCLUDE_APP_APP_H_
 
 
 /********************************************************************************************************/
 /************************************************Includes************************************************/
 /********************************************************************************************************/
-#include "hal/Clk_ctrl.h"
-#include "mcal/nvic.h"
-#include "hal/led.h"
-#include "mcal/systick.h"
-#include "services/sched.h"
-#include "hal/lcd.h"
-
-
+#include "Std_Types.h"
+#include "mcal/uart.h"
+#include "mcal/gpio.h"
 
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
@@ -40,19 +30,8 @@
 /************************************************Types***************************************************/
 /********************************************************************************************************/
 
-enum MyIRQs_e
-{
-  GREEN_LED_ON_IRQ = EXTI0_IRQn,    /*!< EVAL green LED ON interrupt          */
-  GREEN_LED_OFF_IRQ = EXTI1_IRQn,   /*!< EVAL green LED OFF interrupt         */
-}MyIRQs_t;
+
 
 /********************************************************************************************************/
 /************************************************APIs****************************************************/
 /********************************************************************************************************/
-void app1();
-void app2();
-void app3();
-void app4();
-void uart_test();
-
-#endif // C__USERS_MS_STORE_DOCUMENTS_PLATFORMIO_PROJECTS_ARM_INCLUDE_APP_APP_H_

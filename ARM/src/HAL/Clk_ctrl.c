@@ -14,5 +14,13 @@
 
 void set_preipheral_clk(uint32 prei)
 {
-  RCC_enablePeri(RCC_AHB1, prei);
+  if (prei == GPIOA || prei == GPIOB)
+  {  
+    RCC_enablePeri(RCC_AHB1, prei);
+  }
+  else if (prei == USART1)
+  {
+     RCC_enablePeri(RCC_APB2, prei);
+
+  }
 }

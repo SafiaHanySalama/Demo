@@ -122,10 +122,23 @@ void LCD_Test()
     counts++;
     if (counts == 1)
     {
-        LCD_writeStringAsync("Eid Mobark",10);
+        LCD_clearScreenAsynch();
     }
     else if (counts == 5)
     {
-        LCD_clearScreenAsynch();
+        LCD_writeStringAsync("Eid Mobark",10);
+    }
+    else if (counts == 10)
+    {
+        LCD_setCursorPosAsync(1,0);
+    }
+    else if (counts == 15)
+    {
+        LCD_writeStringAsync("Lolo",4);
+    }
+    else if (counts == 20)
+    {
+       // LCD_clearScreenAsynch();
+        //counts = 0;
     }
 }

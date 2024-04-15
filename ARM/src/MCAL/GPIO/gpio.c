@@ -21,6 +21,11 @@
 #define GPIO_GROUP_OF_2_BITS        2
 #define GPIO_GROUP_OF_3_BITS        3
 
+#define GPIO_AF_MASK              0x0000000F
+
+
+
+
 typedef struct
 {
 	uint32 MODER;
@@ -103,4 +108,23 @@ uint32 GPIO_getPinValue(void* port,uint32 pin){
 	uint32 value = ((((GPIO_PortReg *)port )-> IDR) & (1 << pin)) >> pin ;
 
 	return value;
+}
+void GPIO_CFG_AlternativeFunction(void *Port , uint32 PinNum,  uint32 AFNumber)
+{
+	uint32 AFRValue = 0 ;
+	if (PinNum <= GPIO_AF_7)
+	{
+		AFRValue = ((GPIO_PortReg *)Port)->AFRH ;
+
+		AFRValue &= ~(GPIO_AF_MASK << (PinNum * 4));
+		AFRValue |= (AFNumber << (PinNum * 4));
+		((GPIO_PortReg *)Port)->AFRL = AFRValue ;
+	}
+	else
+	{
+		AFRValue = ((GPIO_PortReg *)Port)->AFRH ;
+		AFRValue &= ~(GPIO_AF_MASK<<((PinNum-8)*4));
+		AFRValue |= (AFNumber<<((PinNum-8)*4));
+		((GPIO_PortReg *)Port)->AFRH = AFRValue ;
+	}
 }

@@ -256,14 +256,10 @@ static void LCD_WriteData(uint8 data)
     for (idx = 0; idx < LCD_NUM_DATA_PINS ;idx++)
     {
         //Get the value of each bit
-        pinValue = ((data >> idx) & 1) ;
+        pinValue = (data & (1 << idx)) ;
         GPIO_setPinValue(LCD_Config.Data_Pins[idx].port,LCD_Config.Data_Pins[idx].pin,pinValue);
     }
     GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
-    }
-    else
-    {
-        GPIO_setPinValue(LCD_Config.E_Pin.port,LCD_Config.E_Pin.pin,LOGIC_LOW);
     }
 }
 void LCD_initAsync()
@@ -306,12 +302,17 @@ uint8 LCD_getStatus(void){
 
 static void LCD_writeProcess(){
 
-    for (uint8 idx=0; idx<User_Req.len;idx++)
+    if (User_Req.currentPose.colPos != User_Req.len)
     {
-        LCD_WriteData(User_Req.name[idx]);
+        LCD_WriteData(User_Req.name[User_Req.currentPose.colPos]);
+        User_Req.currentPose.colPos++;
     }
-    User_Req.state = USER_STATE_READY;
-    User_Req.type = NO_REQ;
+    else
+    {
+        User_Req.state = USER_STATE_READY;
+        User_Req.type = NO_REQ;
+    }
+
 }
 static void LCD_clearProcess(){
     LCD_WriteCommand(LCD_CLEAR_COMMAND);

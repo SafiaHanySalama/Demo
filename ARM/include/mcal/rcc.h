@@ -65,6 +65,7 @@
 #define PWR		0x10000000
 /************APB2_BUS_Peripheral_Masks ************/
 #define TIM1	0x00000001
+#define TIM8	0x00000002
 #define USART1	0x00000010
 #define USART6	0x00000020
 #define ADC1	0x00000100

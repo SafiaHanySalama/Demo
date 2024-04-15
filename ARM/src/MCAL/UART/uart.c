@@ -148,20 +148,16 @@ void UART_init(void)
         uint32 BRR;
         uint32 USARTDIV;
 
-        uart->USART_CR1 |= usart_config[i].mode;
-
-        uart->USART_CR1 |= usart_config[i].parity;
-
         uart->USART_CR2 |= usart_config[i].stop_bits;
 
         uart->USART_CR1 |= UART_ENABLE;
         uart->USART_CR1 |= usart_config[i].over_sampling;
         uart->USART_CR1 |= usart_config[i].data_size;
+        uart->USART_CR1 |= usart_config[i].parity;
         /**
          * @brief Calculate the Baud rate
         */
         oversample = (usart_config[i].over_sampling == UART_OVERSAMPLING_16) ? 0 : 1;
-        USARTDIV = (FCPU / (usart_config[i].baudrate *(2- oversample)*8));
         /**
          * Divide the mantissa and fraction
          * The mantissa is the integer part of the division
@@ -171,8 +167,17 @@ void UART_init(void)
          * The fraction is then shifted to the right by 1
          * The BRR is then calculated by combining the mantissa and fraction
         */
-        BRR = (USARTDIV & 0xFFF0) | ((USARTDIV & 0x000F) >> 1);
+        USARTDIV = FCPU * 100 / (usart_config[i].baudrate * (2 - oversample) * 8);
+        uint32 mantissa = USARTDIV / 100;
+        uint32 fraction = ((USARTDIV - (mantissa * 100)) * 16 + 50) / 100;
+
+        if (oversample) {
+            fraction &= 0x07; // If oversampling by 8, only the 3 least significant bits of the fraction are used
+    }
+
+        BRR = (mantissa << 4) | fraction;
         uart->USART_BRR = BRR;
+        uart->USART_SR = 0;
         
     }
 }
@@ -198,8 +203,10 @@ void USART_TxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq)
         TxReq.status = USART_BUSY;
     }
     
-    uart->USART_CR1 |= UART_TX_ENABLE;
-    uart->USART_CR1 |= UART_TXE_FLAG;
+     ((uart_t *)uart)->USART_CR1 |= UART_TX_ENABLE;
+    ((uart_t *)uart)->USART_DR = TxReq.buffer.data[0];
+    TxReq.buffer.index++;
+     ((uart_t *)uart)->USART_CR1 |= UART_TXE_FLAG;
 }
 
 /**
@@ -221,8 +228,8 @@ void USART_RxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq)
         RxReq.rx_cbf = Ptr_UserReq->cbf;
         RxReq.status = USART_BUSY;
     }
-    uart->USART_CR1 |= UART_RX_ENABLE;
-    uart->USART_CR1 |= UART_RXNE_FLAG;
+     ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
+     ((uart_t *)uart)->USART_CR1 |= UART_RXNE_FLAG;
 }
 
 /**
@@ -237,16 +244,22 @@ void UART_sendByte(UART_UserReq_t *Ptr_UserReq)
     volatile uart_t *uart = (uart_t *)uart_base_address[usart_config[Ptr_UserReq->usartID].uartid];
     if (TxReq.status == USART_READY)
     {
-        uint32 timeout = 1000;
+        uint32 timeout = 5000;
         TxReq.status = USART_BUSY;
-        uart->USART_DR = *Ptr_UserReq->ptr_buffer;
-        uart->USART_CR1 |= UART_TX_ENABLE;
-        while ((!(uart->USART_SR & UART_TC_FLAG)) && timeout)
+        //uart->USART_DR = *Ptr_UserReq->ptr_buffer;
+        ((uart_t *)uart)->USART_DR = *(Ptr_UserReq->ptr_buffer);
+        ((uart_t *)uart)->USART_CR1 |= UART_TX_ENABLE;
+        while ((((((uart_t *)uart)->USART_SR) & UART_TC_FLAG)==0) && timeout)
         {
             timeout--;
         }
+        if (timeout == 0)
+        {
+            //debugging
+        }
         TxReq.status = USART_READY;
     }
+
 }
 
 /**
@@ -263,36 +276,36 @@ void UART_receiveByte(UART_UserReq_t *Ptr_UserReq)
     {
         uint32 timeout = 1000;
         RxReq.status = USART_BUSY;
-        uart->USART_CR1 |= UART_RX_ENABLE;
-        while ((!(uart->USART_SR & UART_RXNE_FLAG))&& timeout)
+        ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
+        while (((((uart_t *)uart)->USART_SR & UART_RXNE_FLAG) == 1 )&& timeout)
         {
             timeout--;
         }
-        *Ptr_UserReq->ptr_buffer = uart->USART_DR;
-        uart->USART_CR1 &= ~UART_RX_ENABLE;
+        *Ptr_UserReq->ptr_buffer = ((uart_t *)uart)->USART_DR;
+        ((uart_t *)uart)->USART_CR1 &= ~UART_RX_ENABLE;
         RxReq.status = USART_READY;
     }
 }
 
 void USART1_IRQHandler(void)
 {
-    volatile uart_t *uart = (uart_t *)uart_base_address[usart_config[USART1].uartid];
+    volatile uart_t *uart = (uart_t *)uart_base_address[0];
     
     // Check if UART TX empty flag is set
-    if (UART_TXE_FLAG & uart->USART_SR)
+    if (UART_TXE_FLAG & ((uart_t *)uart)->USART_SR)
     {
         // Check if there is more data to transmit
         if (TxReq.buffer.index < TxReq.buffer.size)
         {
             // Transmit the next byte
-            uart->USART_DR = TxReq.buffer.data[TxReq.buffer.index];
+            ((uart_t *)uart)->USART_DR = TxReq.buffer.data[TxReq.buffer.index];
             TxReq.buffer.index++;
         }
         else
         {
             // Disable UART TX empty flag and enable UART TX complete flag
-            uart->USART_CR1 &= ~UART_TXE_FLAG;
-            uart->USART_CR1 |= UART_TC_FLAG;
+            ((uart_t *)uart)->USART_CR1 &= ~UART_TXE_FLAG;
+            ((uart_t *)uart)->USART_CR1 |= UART_TC_FLAG;
             TxReq.status = USART_READY;
             
             // Call the transmit complete callback function if it is not NULL
@@ -316,7 +329,7 @@ void USART1_IRQHandler(void)
         else
         {
             // Disable UART RX not empty flag
-            uart->USART_CR1 &= ~UART_RXNE_FLAG;
+            ((uart_t *)uart)->USART_CR1 &= ~UART_RXNE_FLAG;
             RxReq.status = USART_READY;
             
             // Call the receive complete callback function if it is not NULL

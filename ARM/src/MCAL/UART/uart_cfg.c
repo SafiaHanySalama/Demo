@@ -24,7 +24,7 @@
 /*********************************************Implementation****************************************/
 /********************************************************************************************************/
 
-const uart_config_t uart_config[_UART_USED_NUM] = {
+const uart_config_t usart_config[_UART_USED_NUM] = {
    [USART1] ={
         .uartid = USART1_IDX,
         .baudrate = USART_BAUDRATE,

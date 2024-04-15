@@ -45,6 +45,23 @@
 #define GPIO_SET_PIN 					0x00000001
 #define GPIO_RESET_PIN 					0x00010000
 
+#define GPIO_AF_0                 0
+#define GPIO_AF_1                 1
+#define GPIO_AF_2                 2
+#define GPIO_AF_3                 3
+#define GPIO_AF_4                 4
+#define GPIO_AF_5                 5
+#define GPIO_AF_6                 6
+#define GPIO_AF_7                 7
+#define GPIO_AF_8                 8
+#define GPIO_AF_9                 9
+#define GPIO_AF_10                10
+#define GPIO_AF_11                11
+#define GPIO_AF_12                12
+#define GPIO_AF_13                13
+#define GPIO_AF_14                14
+#define GPIO_AF_15                15
+
 typedef enum
 {
 	GPIO_LOW_SPEED,
@@ -100,4 +117,6 @@ GPIO_ERROR_t GPIO_init(GPIO_ConfigPin_t *Config_ptr);
 GPIO_ERROR_t GPIO_setPinValue(void* port,uint32 pin, uint32 value);
 
 uint32 GPIO_getPinValue(void* port,uint32 pin);
+
+void GPIO_CFG_AlternativeFunction(void *Port , uint32 PinNum,  uint32 AFNumber);
 #endif /* MCAL_GPIO_GPIO_H_ */

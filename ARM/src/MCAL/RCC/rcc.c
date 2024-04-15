@@ -181,7 +181,7 @@ RCC_ERROR_STATUS RCC_enablePeri(RCC_BUS_ID_t busID, uint32 P_id)
 			temp = RCC->APB2ENR;
 			temp &= ~(P_id);
 			temp |= P_id;
-			RCC->AHB2ENR = temp;
+			RCC->APB2ENR = temp;
 			break;
 		default:
 			ReturnStatus = RCC_NOK;
