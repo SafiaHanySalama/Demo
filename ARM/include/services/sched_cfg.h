@@ -19,8 +19,12 @@ typedef enum
   //LED_StateMachine,
   //LED_Toggle,
   //LED_SW,
-  LCD,
-  LCDTest,
+  LCDRunnable, //LCD Init
+  LCDTest, // LCD Display
+  Runnable_SwitchesTx,
+	Runnable_UARTSignalRx,
+	Runnable_Clock,
+	Runnable_StopWatch,
   _num_runnable
 }Run_t;
 
@@ -29,5 +33,9 @@ extern void Runnable_LED_SW(void);
 extern void Runnable_LED_StateMachine(void);
 extern void LCD_Runnable(void);
 extern void LCD_Test(void);
+extern void MCU1_SwitchesTx(void);
+extern void MCU1_UARTSignalRx(void);
+extern void MCU1_Clock(void);
+extern void MCU1_StopWatch(void);
 
 #endif /* INCLUDE_SERVICES_RUNNABLE_H_ */

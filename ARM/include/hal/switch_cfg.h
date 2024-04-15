@@ -15,9 +15,14 @@
 
 
 typedef enum{
-SWITCH1,
-SWITCH2,
-_sw_num // user will not use it ,this indicates the num of leds stated by user
+	Up_Start,
+	Down_End,
+	Right_Pause,
+	Left_Reset,
+	Edit,
+	Mode,
+	Okay,
+    _sw_num // user will not use it ,this indicates the num of leds stated by user
 }SWITCHES_t;
 
 #endif /* HAL_SWITCH_SWITCH_CFG_H_ */

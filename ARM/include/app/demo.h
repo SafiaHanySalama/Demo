@@ -2,47 +2,73 @@
 *
 * Module: 
 *
-* File Name: runnables.h
+* File Name: demo.h
 *
 
 * Description: 
 *
-* Author: Safia Hany
+* Author: Team7
 * 
-* Date:  29/3/2024
+* Date:  16/4/2024
 ******************************************************************************/
 
 
 /********************************************************************************************************/
 /************************************************Includes************************************************/
 /********************************************************************************************************/
+#include <stdio.h>
 
-#include "hal/led.h"
+#include "STD_TYPES.h"
+#include "app/runnables.h"
 #include "hal/switch.h"
-#include "hal/lcd.h"
+#include "services/sched.h"
+#include "mcal/UART.h"
+
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
 
+#define TRUE 1
 
+#define FALSE 0
+
+#define MODE_TIMENDATE 0
+#define MODE_SW  1
+
+#define MAX_LCD_COL  15
+#define MAX_LCD_ROW 2
+
+#define START_X_POSITION 0
+#define START_Y_POSITION 0
+
+#define SIZE_BUFFER1 33
+
+#define SIZE_BUFFER2 33
+
+#define SIZE_BUFFER3 33
 
 /********************************************************************************************************/
 /************************************************Types***************************************************/
 /********************************************************************************************************/
 
+typedef struct {
+    uint8 hours;
+    uint8 minutes;
+    uint8 seconds;
+    uint8 dayPassed;
+}CustomTime;
+
+typedef struct  {
+    uint8 day;
+    uint8 month;
+    uint8 year;
+}CustomDate;
 
 
 /********************************************************************************************************/
 /************************************************APIs****************************************************/
 /********************************************************************************************************/
-void Runnable_LED_Toggle();
-void Runnable_LED_SW(void);
-void Runnable_LED_StateMachine(void);
-void Runnable_LED_Toggle(void);
-void Runnable_LED_SW(void);
-void Runnable_LED_StateMachine(void);
-void LCD_Runnable(void);
-void LCD_Test(void);
+
 void MCU1_SwitchesTx(void);
 void MCU1_UARTSignalRx(void);
 void MCU1_Clock(void);
