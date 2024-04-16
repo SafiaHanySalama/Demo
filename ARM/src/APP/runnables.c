@@ -62,7 +62,7 @@ void Runnable_LED_Toggle()
 void Runnable_LED_SW(void)
 {
     SWITCH_State_t sw_state;
-    sw_state = SWITCH_Getstatus(SWITCH1);
+    sw_state = SWITCH_Getstatus(Up_Start);
     if (sw_state == BRESSED)
     {
         //led_setState(led_green,led_state_on);

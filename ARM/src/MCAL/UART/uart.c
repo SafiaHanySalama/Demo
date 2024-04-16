@@ -274,7 +274,7 @@ void UART_receiveByte(UART_UserReq_t *Ptr_UserReq)
     volatile uart_t *uart = (uart_t *)uart_base_address[usart_config[Ptr_UserReq->usartID].uartid];
     if (RxReq.status == USART_READY)
     {
-        uint32 timeout = 1000;
+        volatile uint32 timeout = 1000;
         RxReq.status = USART_BUSY;
         ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
         while (((((uart_t *)uart)->USART_SR & UART_RXNE_FLAG) == 1 )&& timeout)

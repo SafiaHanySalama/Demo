@@ -41,9 +41,9 @@
 #define START_X_POSITION 0
 #define START_Y_POSITION 0
 
-#define SIZE_BUFFER1 33
+#define SIZE_BUFFER1 9
 
-#define SIZE_BUFFER2 33
+#define SIZE_BUFFER2 11
 
 #define SIZE_BUFFER3 33
 
