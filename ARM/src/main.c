@@ -32,7 +32,6 @@ void App_Init ()
 int main()
 {
   App_Init();
-  LCD_clearScreenAsynch();
   sched_init();
   sched_start();
   return 0;

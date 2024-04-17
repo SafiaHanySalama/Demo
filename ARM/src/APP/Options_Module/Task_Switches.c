@@ -23,11 +23,11 @@
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
 
-CustomTime currentTime = {8, 24, 0, 0};
+CustomTime currentTime = {10, 24, 11, 0};
 
 CustomTime sw = {0, 0, 0};
 
-CustomDate currentDate = {1, 1, 2024}; // Initial date: January 1, 2024
+CustomDate currentDate = {17, 11, 2024}; // Initial date: January 1, 2024
 
 static uint8 Mode_Flag = MODE_TIMENDATE;
 static uint8 Edit_flag=0;

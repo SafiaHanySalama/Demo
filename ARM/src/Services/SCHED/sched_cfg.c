@@ -66,7 +66,7 @@ const runnable_t runnable_list[_num_runnable]=
 		[Runnable_Clock]=
 		{
 			.name="Runnable_Clock",
-			.periodicity_ms = 2000,
+			.periodicity_ms = 700,
 			.cb=MCU1_Clock,
 			.delayms = 10
 		},
