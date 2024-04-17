@@ -25,7 +25,6 @@
 
 CustomTime currentTime = {10, 24, 11, 0};
 
-CustomTime sw = {0, 0, 0};
 
 CustomDate currentDate = {17, 11, 2024}; // Initial date: January 1, 2024
 

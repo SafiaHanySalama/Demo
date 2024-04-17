@@ -70,18 +70,10 @@ const runnable_t runnable_list[_num_runnable]=
 			.cb=MCU1_Clock,
 			.delayms = 10
 		},
-/* 		[Runnable_Day]=
-		{
-			.name="Runnable_Day",
-			.periodicity_ms =100000,
-			.cb =  MCU1_Day,
-			.delayms = 15
-		}, */
-		/* ,
 		[Runnable_StopWatch]={
 			.name="Runnable_StopWatch",
-			.periodicity_ms=500,
+			.periodicity_ms = 1400,
 			.cb=MCU1_StopWatch,
-			.delayms =0
-		} */	
+			.delayms = 5
+		}	
 };

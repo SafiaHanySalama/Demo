@@ -25,8 +25,7 @@ typedef enum
 	//Runnable_UARTSignalRx,
   SwitchRunnable,
 	Runnable_Clock,
-  //Runnable_Day,
-	//Runnable_StopWatch,
+	Runnable_StopWatch,
   _num_runnable
 }Run_t;
 
