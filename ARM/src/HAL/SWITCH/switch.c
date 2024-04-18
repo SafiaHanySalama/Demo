@@ -36,15 +36,17 @@ void SWITCH_init(void){
 	}
 }
 SWITCH_State_t SWITCH_Getstatus(uint32 switch_num){
-#ifndef RUNNABLE_USED
+//#ifndef RUNNABLE_USED
 	uint8 state_local;
-	state = GPIO_getPinValue(switches[switch_num].port,switches[switch_num].pin);
+	state_local = GPIO_getPinValue(switches[switch_num].port,switches[switch_num].pin);
 	//if state_local = HIGH and switch pull up i want to return RELEASED
-	return (state_local ^switches[switch_num].connection) ;
+	return (state_local^switches[switch_num].connection) ;
 
+/*
 #else
 	return (state[switch_num] ^switches[switch_num].connection) ;
 #endif
+*/
 }
 #ifdef RUNNABLE_USED
 void SWITCH_Runnable(void)

@@ -41,9 +41,9 @@
 #define START_X_POSITION 0
 #define START_Y_POSITION 0
 
-#define SIZE_BUFFER1 9
+#define SIZE_BUFFER1 33
 
-#define SIZE_BUFFER2 11
+#define SIZE_BUFFER2 33
 
 #define SIZE_BUFFER3 33
 
@@ -52,23 +52,23 @@
 /********************************************************************************************************/
 
 typedef struct {
-    uint32 hours;
-    uint32 minutes;
-    uint32 seconds;
-    uint32 dayPassed;
+    uint8 hours;
+    uint8 minutes;
+    uint8 seconds;
+    uint8 dayPassed;
 }CustomTime;
 
 typedef struct  {
-    uint32 day;
-    uint32 month;
-    uint32 year;
+    uint8 day;
+    uint8 month;
+    uint8 year;
 }CustomDate;
 
 
 /********************************************************************************************************/
 /************************************************APIs****************************************************/
 /********************************************************************************************************/
-
+void  RecieverCallBack(void);
 void MCU1_SwitchesTx(void);
 void MCU1_UARTSignalRx(void);
 void MCU1_Clock(void);

@@ -35,45 +35,33 @@ const runnable_t runnable_list[_num_runnable]=
 		[LCDRunnable] = {
 			.name = "LCD",
 			.periodicity_ms = 2,
-			.cb = LCD_Runnable,
+			.cb =NULL_PTR,//LCD_Runnable,
 			.delayms =0
 		},
-		[SwitchRunnable] = 
-		{
-			.name = "Get switch state",
-			.periodicity_ms = 20,
-			.cb = SWITCH_Runnable,
-			.delayms = 30
-		},
-/*		[LCDTest] = {
+		[LCDTest] = {
 			.name = "LCDTest",
 			.periodicity_ms = 1000,
-			.cb = LCD_Test,
+			.cb = NULL_PTR,//LCD_Test,
 			.delayms =20
 		},
- 		[Runnable_SwitchesTx]={
-			.name="Runnable_Switches",
-			.periodicity_ms=1000,
+		[Runnable_SwitchesTx]={.name="Runnable_Switches",
+			.periodicity_ms=500,
 			.cb=MCU1_SwitchesTx,
 			.delayms =0
 		},
-		[Runnable_UARTSignalRx]={
-			.name="Runnable_UARTSignal",
+		[Runnable_UARTSignalRx]={.name="Runnable_UARTSignal",
 			.periodicity_ms=500,
 			.cb=MCU1_UARTSignalRx,
 			.delayms =0
-		}, */
-		[Runnable_Clock]=
-		{
-			.name="Runnable_Clock",
-			.periodicity_ms = 700,
-			.cb=MCU1_Clock,
-			.delayms = 10
 		},
-		[Runnable_StopWatch]={
-			.name="Runnable_StopWatch",
-			.periodicity_ms = 1400,
-			.cb=MCU1_StopWatch,
-			.delayms = 5
+		[Runnable_Clock]={.name="Runnable_Clock",
+			.periodicity_ms=1000,
+			.cb=NULL_PTR,//MCU1_Clock,
+			.delayms =0
+		},
+		[Runnable_StopWatch]={.name="Runnable_StopWatch",
+			.periodicity_ms=500,
+			.cb=NULL_PTR,//MCU1_StopWatch,
+			.delayms =0
 		}	
 };

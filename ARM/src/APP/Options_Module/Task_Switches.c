@@ -18,15 +18,15 @@
 /********************************************************************************************************/
 
 #include "app/demo.h"
-
 /********************************************************************************************************/
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
 
-CustomTime currentTime = {10, 24, 11, 0};
+CustomTime currentTime = {0, 0, 0, 0};
 
+CustomTime sw = {0, 0, 0};
 
-CustomDate currentDate = {17, 11, 2024}; // Initial date: January 1, 2024
+CustomDate currentDate = {1, 1, 2024}; // Initial date: January 1, 2024
 
 static uint8 Mode_Flag = MODE_TIMENDATE;
 static uint8 Edit_flag=0;
@@ -39,8 +39,13 @@ static uint8 paused = FALSE;
 
 static uint8 reset = FALSE ;
 
+uint8 UART_RecivedByte = 100 ;
+
+uint8 RecieverHasByte = FALSE;
+
 uint8 Switch_State[_sw_num]={REALESED,REALESED,REALESED,REALESED,REALESED,REALESED,REALESED} ;
-uint8 switchMsg[_sw_num] = {1, 2, 3, 4, 5, 6, 7};
+uint8 switchMsg[_sw_num] = {1, 2, 3, 4, 5, 6, 7}; //it is not useful if i use name of switches (enum) in recieving because enum starts at 0
+//uint8 switchMsg[_sw_num] = {0,1, 2, 3, 4, 5, 6};
 uint8 recievedMsg;
 
 UART_UserReq_t uart_SW_req = {
@@ -54,7 +59,7 @@ UART_UserReq_t uart_recievedMsg = {
 	.usartID = USART1_IDX,
 	.ptr_buffer = &recievedMsg, 
 	.size = 1,
-	.cbf = NULL_PTR
+	.cbf = RecieverCallBack
 };
 
 
@@ -100,14 +105,19 @@ UART_UserReq_t uart_recievedMsg = {
 	BRESSED
 }SWITCH_State_t;
  */
+/*
+void  RecieverCallBack(){
+	RecieverHasByte = TRUE;
+}
 
+*/
 void MCU1_SwitchesTx(void)
 {
 	// Iterate through all the switches
-	for (uint8 Switches_Count = 0; Switches_Count < _sw_num - 1; Switches_Count++)
+	for (uint8 Switches_Count = 0; Switches_Count < _sw_num ; Switches_Count++)
 	{
 		// Get the status of the switch
-		Switch_State[Switches_Count] = SWITCH_Getstatus(Switches_Count + 1);
+		Switch_State[Switches_Count] = SWITCH_Getstatus(Switches_Count );
 	}
 
 	// Check if the Up_Start switch is pressed
@@ -115,15 +125,16 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Up_Start];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Up_Start] = REALESED;
+		
 	}
 	// Check if the Down_End switch is pressed
 	else if (Switch_State[Down_End] == BRESSED)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Down_End];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Down_End] = REALESED;
 	}
 	// Check if the Right_Pause switch is pressed
@@ -131,7 +142,7 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Right_Pause];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Right_Pause] = REALESED;
 	}
 	// Check if the Left_Reset switch is pressed
@@ -139,7 +150,7 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Left_Reset];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Left_Reset] = REALESED;
 	}
 	// Check if the Edit switch is pressed
@@ -147,7 +158,7 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Edit];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Edit] = REALESED;
 	}
 	// Check if the Mode switch is pressed
@@ -155,7 +166,7 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Mode];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Mode] = REALESED;
 	}
 	// Check if the Okay switch is pressed
@@ -163,7 +174,7 @@ void MCU1_SwitchesTx(void)
 	{
 		// Send the corresponding switch message through UART
 		uart_SW_req.ptr_buffer = &switchMsg[Okay];
-		UART_SendByte(&uart_SW_req);
+		UART_sendByte(&uart_SW_req);
 		Switch_State[Okay] = REALESED;
 	}
 	else
@@ -181,20 +192,31 @@ void MCU1_SwitchesTx(void)
 
 void MCU1_UARTSignalRx(void)
 {
-	uint8 UART_RecivedByte = 0 ;
+	USART_RxBufferAsyncZeroCopy(&uart_recievedMsg);
 
+}
+
+void RecieverCallBack(void){
+	//if(RecieverHasByte){
+	//RecieverHasByte = FALSE;
+	//UART_RecivedByte = 0 ;
+	
 	/**
 	 * @todo Uart Recive Byte take req as argument
 	*/
-	UART_ReciveByte (&uart_recievedMsg);
+	//UART_receiveByte(&uart_recievedMsg);
+	//USART_RxBufferAsyncZeroCopy(&uart_recievedMsg);
 	UART_RecivedByte = *(uart_recievedMsg.ptr_buffer);
-
-	if (UART_RecivedByte != 0)
+	
+	if (UART_RecivedByte  != 0)
 	{
+		/***************for testing********/
+		UART_sendByte(&uart_recievedMsg);
+		/*********************************/
 		switch (Mode_Flag)
 		{
 			case (MODE_TIMENDATE):
-				switch (UART_RecivedByte)
+				switch (UART_RecivedByte-1)
 				{
 					case Up_Start:
 						if (Edit_flag == 1)
@@ -263,7 +285,7 @@ void MCU1_UARTSignalRx(void)
 							}
 
 						}
-
+						//UART_RecivedByte = 100 ;
 						break;
 					case Down_End:
 						if (Edit_flag == 1)
@@ -442,4 +464,5 @@ void MCU1_UARTSignalRx(void)
 		}
 
 	}
+	//}
 }

@@ -31,8 +31,6 @@ extern const runnable_t runnable_list[_num_runnable];
 
 // variable to determine if we should call schedule
 static volatile uint32 pendingTicks=0;
-// 
-uint32 g_timer = 0 ;
 /*******************************************************************************
  *                         Static Function Prototypes		                   *
  *******************************************************************************/
@@ -44,7 +42,6 @@ static void tickcb(void) ;
 void tickcb(void)
 {
 	pendingTicks++;
-
 }
 void sched_init(void)
 {
@@ -97,7 +94,6 @@ static void sched(void)
 		}
 
 		rinfo[idx].remainTimeMS -= TICK_TIME; // One MS passed
-		g_timer++;
 
 	}
 }

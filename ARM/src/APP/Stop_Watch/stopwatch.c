@@ -2,7 +2,7 @@
 *
 * Module: 
 *
-* File Name: StopWatch.c
+* File Name: stopwatch.c
 *
 
 * Description: 
@@ -35,24 +35,24 @@
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
 
-extern uint8 running; // Start the StopWatch immediately
+extern uint8 running; // Start the stopwatch immediately
 
 extern uint8 paused;
 
 extern uint8 reset;
 
-CustomTime StopWatch = {0, 0, 0};
+extern CustomTime sw;
 
 /********************************************************************************************************/
 /*****************************************Static Functions Prototype*************************************/
 /********************************************************************************************************/
 
 
- static void displayStopwatch(const CustomTime *StopWatch) ;
+ static void displayStopwatch(const CustomTime *sw) ;
 
- static void updateStopwatch(CustomTime *StopWatch) ;
+ static void updateStopwatch(CustomTime *sw) ;
 
- static void resetStopwatch(CustomTime *StopWatch) ;
+ static void resetStopwatch(CustomTime *sw) ;
 
  static void pauseStopwatch(char *paused);
 
@@ -69,17 +69,17 @@ void MCU1_StopWatch(void)
      {
         if (!paused)
          {
-             updateStopwatch(&StopWatch);
+             updateStopwatch(&sw);
         }
         else if (reset)
         {
-        	resetStopwatch(&StopWatch);
+        	resetStopwatch(&sw);
         }
         else
         {
 
         }
-         displayStopwatch(&StopWatch);
+         displayStopwatch(&sw);
      }
       else
       {
@@ -88,78 +88,33 @@ void MCU1_StopWatch(void)
  }
 
 
-static void resetStopwatch(CustomTime *StopWatch) {
-     StopWatch->hours = 0;
-     StopWatch->minutes = 0;
-     StopWatch->seconds = 0;
+static void resetStopwatch(CustomTime *sw) {
+     sw->hours = 0;
+     sw->minutes = 0;
+     sw->seconds = 0;
  }
 
-static void updateStopwatch(CustomTime *StopWatch) {
-     StopWatch->seconds++;
-     if (StopWatch->seconds > 60) {
-         StopWatch->seconds = 0;
-         StopWatch->minutes++;
-         if (StopWatch->minutes > 60) {
-             StopWatch->minutes = 0;
-             StopWatch->hours++;
+static void updateStopwatch(CustomTime *sw) {
+     sw->seconds++;
+     if (sw->seconds > 60) {
+         sw->seconds = 0;
+         sw->minutes++;
+         if (sw->minutes > 60) {
+             sw->minutes = 0;
+             sw->hours++;
          }
      }
  }
 
-static void displayStopwatch(const CustomTime *StopWatch) {
+static void displayStopwatch(const CustomTime *sw) {
 
-    static uint8 count= 0;
-    const uint8* Timebreak = ":";
-    const uint8* Daybreak = "/";
-    const uint32 zero = 0;
-    static uint8 Firstflag = 0;
-    if (Firstflag == 0)
-    {
-        LCD_clearScreenAsynch();
-        Firstflag = 1;
-    }
-    else
-    {
-        count++;
-        if (count == 1)
-        {
-            LCD_setCursorPosAsync(START_X_POSITION, START_Y_POSITION + 5);
-        }
-        else if (count == 2)
-        {
-            updateCustomTime(&StopWatch);
-            if (StopWatch->hours<10)
-            {
-                LCD_writeNumberAsync(zero);
-            }
-            LCD_writeNumberAsync(StopWatch->hours);
-            
-        }
-        else if (count == 3)
-        {
-            LCD_writeStringAsync(Timebreak,1);
-        }
-        else if (count == 4)
-        {
-            if (StopWatch->minutes<10)
-            {
-                LCD_writeNumberAsync(zero);
-            }
-            LCD_writeNumberAsync(StopWatch->minutes);
-        }
-        else if (count == 5)
-        {
-            LCD_writeStringAsync(Timebreak,1);
-        }
-        else if (count == 6)
-        {
-            if (StopWatch->seconds <10)
-            {
-                LCD_writeNumberAsync(zero);
-            }
-            LCD_writeNumberAsync(StopWatch->seconds);
-        }
-    }
+    uint8 Buffer3[SIZE_BUFFER3];
+
+    sprintf(Buffer3,"\rStopwatch: %02d:%02d:%02d", sw->hours, sw->minutes, sw->seconds);
+
+    LCD_setCursorPosAsync(START_X_POSITION,START_Y_POSITION);
+
+    LCD_writeStringAsync(&Buffer3,SIZE_BUFFER3);
 
  }
 
