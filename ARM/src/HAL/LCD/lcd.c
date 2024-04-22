@@ -44,18 +44,7 @@
 /********************************************************************************************************/
 /************************************************Types***************************************************/
 /********************************************************************************************************/
-typedef enum{
-    USER_STATE_BUSY,
-    USER_STATE_READY
-}Userstate_t;
 
-typedef enum{
-    NO_REQ,
-    WRITE_REQ,
-    CLEAR_REQ,
-    SET_POS_REQ,
-    NUM_REQ
-}CommandType_t;
 
 typedef enum{
     POWER_ON_MODE,
@@ -72,12 +61,24 @@ typedef enum{
     LCD_OPERATIONAL
 }LCD_State_t;
 
-typedef void (*CB_fn_t)(void);
 typedef struct
 {
     uint8 linePos;
     uint8 colPos;
 }CursorPose_t;
+
+typedef enum{
+    USER_STATE_BUSY,
+    USER_STATE_READY
+}Userstate_t;
+
+typedef enum{
+    NO_REQ,
+    WRITE_REQ,
+    CLEAR_REQ,
+    SET_POS_REQ,
+    NUM_REQ
+}CommandType_t;
 
 typedef struct 
 {
@@ -87,6 +88,11 @@ typedef struct
     Userstate_t state;
     CursorPose_t currentPose;
 }User_Request_t;
+
+
+typedef void (*CB_fn_t)(void);
+
+
 
 
 /********************************************************************************************************/
@@ -100,7 +106,6 @@ CursorPose_t g_currPos;
 static LCD_Mode_t g_LCD_initMode = POWER_ON_MODE;
 static LCD_State_t g_LCD_State = LCD_OFF;
 static uint8 g_LCD_enablePin = ENABLE_PIN_LOW;
-
 /********************************************************************************************************/
 /*****************************************Static Functions Prototype*************************************/
 /********************************************************************************************************/

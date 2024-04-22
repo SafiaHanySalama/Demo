@@ -22,7 +22,7 @@
 #define SWITCH_PULLUP		1
 #define SWITCH_PULLDOWN		0
 
-#define RUNNABLE_USED
+//#define RUNNABLE_USED
 
 typedef struct {
 	void * port;

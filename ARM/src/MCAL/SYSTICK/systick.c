@@ -52,9 +52,8 @@ void SYSTICK_Init(uint8 mode)
 	/*select system clock
 	 * enable interrupt
 	 * enable systick timer*/
-	Systick -> CTRL = SysTick_CTRL_CLKSOURCE_Msk |
-			SysTick_CTRL_TICKINT_Msk   |
-			SysTick_CTRL_ENABLE_Msk;
+	Systick -> CTRL |= SysTick_CTRL_TICKINT_Msk ;
+	Systick -> CTRL |=SysTick_CTRL_ENABLE_Msk;
 
 }
 void SYSTICK_set_ms(uint32 time){

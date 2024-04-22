@@ -32,6 +32,7 @@ void App_Init ()
 int main()
 {
   App_Init();
+  
   sched_init();
   sched_start();
   return 0;

@@ -38,6 +38,7 @@ const runnable_t runnable_list[_num_runnable]=
 			.cb = LCD_Runnable,
 			.delayms =0
 		},
+		/*
 		[SwitchRunnable] = 
 		{
 			.name = "Get switch state",
@@ -45,34 +46,35 @@ const runnable_t runnable_list[_num_runnable]=
 			.cb = SWITCH_Runnable,
 			.delayms = 30
 		},
-/*		[LCDTest] = {
+		
+		[LCDTest] = {
 			.name = "LCDTest",
 			.periodicity_ms = 1000,
 			.cb = LCD_Test,
 			.delayms =20
-		},
+		},*/
  		[Runnable_SwitchesTx]={
 			.name="Runnable_Switches",
-			.periodicity_ms=1000,
+			.periodicity_ms=100,
 			.cb=MCU1_SwitchesTx,
 			.delayms =0
 		},
 		[Runnable_UARTSignalRx]={
 			.name="Runnable_UARTSignal",
-			.periodicity_ms=500,
+			.periodicity_ms=60,
 			.cb=MCU1_UARTSignalRx,
 			.delayms =0
-		}, */
+		}, 
 		[Runnable_Clock]=
 		{
 			.name="Runnable_Clock",
-			.periodicity_ms = 700,
+			.periodicity_ms = 52,
 			.cb=MCU1_Clock,
 			.delayms = 10
 		},
 		[Runnable_StopWatch]={
 			.name="Runnable_StopWatch",
-			.periodicity_ms = 1400,
+			.periodicity_ms = 100,
 			.cb=MCU1_StopWatch,
 			.delayms = 5
 		}	

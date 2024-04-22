@@ -25,7 +25,7 @@
 /********************************************************************************************************/
 
 const uart_config_t usart_config[_UART_USED_NUM] = {
-   [USART1] ={
+   [USART1_enum] ={
         .uartid = USART1_IDX,
         .baudrate = USART_BAUDRATE,
         .data_size = UART_WORD_LENGTH_8,

@@ -23,6 +23,7 @@
 #include "hal/switch.h"
 #include "services/sched.h"
 #include "mcal/UART.h"
+#include "hal/lcd.h"
 
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
@@ -73,3 +74,4 @@ void MCU1_SwitchesTx(void);
 void MCU1_UARTSignalRx(void);
 void MCU1_Clock(void);
 void MCU1_StopWatch(void);
+void RecieverCallBack(void);

@@ -21,8 +21,8 @@ typedef enum
   //LED_SW,
   LCDRunnable, //LCD Init
   //LCDTest, // LCD Display
-  //Runnable_SwitchesTx,
-	//Runnable_UARTSignalRx,
+  Runnable_SwitchesTx,
+	Runnable_UARTSignalRx,
   SwitchRunnable,
 	Runnable_Clock,
 	Runnable_StopWatch,
