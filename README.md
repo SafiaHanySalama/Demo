@@ -3,6 +3,15 @@
 ## Description
 
 This project is a comprehensive ARM-based application designed to run on an STM32F401CC microcontroller. It includes several modules and functionalities, such as LCD display, UART communication, clock, and stopwatch.
+-	Each MCU has an LCD which displays:
+	o	Date and Time
+	o	Stop watch
+-	Each MCU has switches to control the LCD of the other MCU
+-	The communication between MCUs could be UART or any other protocol
+-	When switching from Stop watch mode to Date & Time mode then going back to Stop watch. The Stop watch should be resuming its previous work
+-  Feature for editing any digit in time or date
+- Feature switching from time and date to stopwatch mode and vise versa
+- Feature for pausing, resuming and reset stop watch
 
 ## Getting Started
 
@@ -36,8 +45,10 @@ This project includes several applications that demonstrate different functional
 
 ## Authors
 
-[Your Name]
-[Your Contact Info]
+*Safia Hany Salama*
+*Shereen Reda*
+*Alaa Ahmed*
+*Rana Ali*
 
 ## Version History
 
