@@ -18,34 +18,32 @@
 /********************************************************************************************************/
 
 #include "app/demo.h"
+
 /********************************************************************************************************/
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
 
-CustomTime currentTime = {0, 0, 0, 0};
+extern uint8 lcdx;
+extern uint8 lcdy;
 
-CustomTime sw = {0, 0, 0};
+CustomTime currentTime = {10, 24, 11, 0};
 
-CustomDate currentDate = {1, 1, 2024}; // Initial date: January 1, 2024
+
+CustomDate currentDate = {17, 11, 2024}; // Initial date: January 1, 2024
 
 static uint8 Mode_Flag = MODE_TIMENDATE;
-static uint8 Edit_flag=0;
-static uint8 Y_position=0;
-static uint8 X_position=0;
+uint8 Edit_flag=0;
+static uint8 Y_position= 0;
+static uint8 X_position= 0;
 
-static uint8 running = FALSE; // Start the stopwatch immediately
+/*static*/ extern volatile uint8 running; 
 
-static uint8 paused = FALSE;
-
-static uint8 reset = FALSE ;
-
+/*static*/ uint8 paused = FALSE;
 uint8 UART_RecivedByte = 100 ;
-
-uint8 RecieverHasByte = FALSE;
+/*static*/ uint8 reset = FALSE ;
 
 uint8 Switch_State[_sw_num]={REALESED,REALESED,REALESED,REALESED,REALESED,REALESED,REALESED} ;
-uint8 switchMsg[_sw_num] = {1, 2, 3, 4, 5, 6, 7}; //it is not useful if i use name of switches (enum) in recieving because enum starts at 0
-//uint8 switchMsg[_sw_num] = {0,1, 2, 3, 4, 5, 6};
+uint8 switchMsg[_sw_num] = {1, 2, 3, 4, 5, 6, 7};
 uint8 recievedMsg;
 
 UART_UserReq_t uart_SW_req = {
@@ -105,19 +103,14 @@ UART_UserReq_t uart_recievedMsg = {
 	BRESSED
 }SWITCH_State_t;
  */
-/*
-void  RecieverCallBack(){
-	RecieverHasByte = TRUE;
-}
 
-*/
 void MCU1_SwitchesTx(void)
 {
 	// Iterate through all the switches
 	for (uint8 Switches_Count = 0; Switches_Count < _sw_num ; Switches_Count++)
 	{
 		// Get the status of the switch
-		Switch_State[Switches_Count] = SWITCH_Getstatus(Switches_Count );
+		Switch_State[Switches_Count] = SWITCH_Getstatus(Switches_Count);
 	}
 
 	// Check if the Up_Start switch is pressed
@@ -127,7 +120,6 @@ void MCU1_SwitchesTx(void)
 		uart_SW_req.ptr_buffer = &switchMsg[Up_Start];
 		UART_sendByte(&uart_SW_req);
 		Switch_State[Up_Start] = REALESED;
-		
 	}
 	// Check if the Down_End switch is pressed
 	else if (Switch_State[Down_End] == BRESSED)
@@ -197,18 +189,14 @@ void MCU1_UARTSignalRx(void)
 }
 
 void RecieverCallBack(void){
-	//if(RecieverHasByte){
-	//RecieverHasByte = FALSE;
-	//UART_RecivedByte = 0 ;
 	
+
 	/**
 	 * @todo Uart Recive Byte take req as argument
 	*/
-	//UART_receiveByte(&uart_recievedMsg);
-	//USART_RxBufferAsyncZeroCopy(&uart_recievedMsg);
 	UART_RecivedByte = *(uart_recievedMsg.ptr_buffer);
-	
-	if (UART_RecivedByte  != 0)
+
+	if (UART_RecivedByte != 0)
 	{
 		/***************for testing********/
 		UART_sendByte(&uart_recievedMsg);
@@ -222,60 +210,60 @@ void RecieverCallBack(void){
 						if (Edit_flag == 1)
 						{
 							// LCD_setCursorPosAsync(uint8 posX, uint8 posY);
-							if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION))
+							if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION))
 							{
 								currentTime.hours += 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 1))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 1))
 							{
 								currentTime.hours += 1;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 3))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 3))
 							{
 								currentTime.minutes += 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 4))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 4))
 							{
 								currentTime.minutes += 1;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 6))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 6))
 							{
 								currentTime.seconds += 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 7))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 7))
 							{
 								currentTime.seconds += 1;
 							}
 							/****************************************/
-							if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION))
+							if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION))
 							{
 								currentDate.day += 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 1))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 1))
 							{
 								currentDate.day += 1;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 3))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 3))
 							{
 								currentDate.month += 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 4))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 4))
 							{
 								currentDate.month += 1;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 6))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 6))
 							{
 								currentDate.year += 1000;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 7))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 7))
 							{
 								currentDate.year += 100;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 8))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 8))
 							{
 								currentDate.year += 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 9))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 9))
 							{
 								currentDate.year += 1;
 							}
@@ -285,66 +273,66 @@ void RecieverCallBack(void){
 							}
 
 						}
-						//UART_RecivedByte = 100 ;
+
 						break;
 					case Down_End:
 						if (Edit_flag == 1)
 						{
 							// LCD_setCursorPosAsync(uint8 posX, uint8 posY);
-							if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION))
+							if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION))
 							{
 								currentTime.hours -= 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 1))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 1))
 							{
 								currentTime.hours -= 1;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 3))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 3))
 							{
 								currentTime.minutes -= 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 4))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 4))
 							{
 								currentTime.minutes -= 1;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 6))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 6))
 							{
 								currentTime.seconds -= 10;
 							}
-							else if ((X_position == START_X_POSITION) && (Y_position = START_Y_POSITION + 7))
+							else if ((X_position == START_X_POSITION) && (Y_position == START_Y_POSITION + 7))
 							{
 								currentTime.seconds -= 1;
 							}
 							/****************************************/
-							if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION))
+							if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION))
 							{
 								currentDate.day -= 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 1))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 1))
 							{
 								currentDate.day -= 1;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 3))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 3))
 							{
 								currentDate.month -= 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 4))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 4))
 							{
 								currentDate.month -= 1;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 6))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 6))
 							{
 								currentDate.year -= 1000;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 7))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 7))
 							{
 								currentDate.year -= 100;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 8))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 8))
 							{
 								currentDate.year -= 10;
 							}
-							else if ((X_position == START_X_POSITION + 1) && (Y_position = START_Y_POSITION + 9))
+							else if ((X_position == START_X_POSITION + 1) && (Y_position == START_Y_POSITION + 9))
 							{
 								currentDate.year -= 1;
 							}
@@ -360,19 +348,23 @@ void RecieverCallBack(void){
 					case Right_Pause:
 						if (Edit_flag == 1)
 						{
-							if ((Y_position > MAX_LCD_COL) && (X_position == 0))
+							if ((Y_position== MAX_LCD_COL) && (X_position  == 1))
 							{
 								Y_position = 0;
-								LCD_setCursorPosAsync(X_position + 1, Y_position);
+								X_position = 0;
+								LCD_setCursorPosAsync(X_position , Y_position);
 							}
-							else if ((Y_position > MAX_LCD_COL) && (X_position == 1))
+							else if ((Y_position >= MAX_LCD_COL) && (X_position == 0))
 							{
-								Y_position = 0;
-								LCD_setCursorPosAsync(X_position - 1, Y_position);
+								X_position = 1;
+								Y_position=0;
+								LCD_setCursorPosAsync(X_position , Y_position);
 							}
 							else
 							{
-								LCD_setCursorPosAsync(X_position, Y_position + 1);
+								Y_position +=1;
+								LCD_setCursorPosAsync(X_position, Y_position);
+
 							}
 
 
@@ -383,19 +375,22 @@ void RecieverCallBack(void){
 					case Left_Reset:
 						if (Edit_flag == 1)
 						{
-							if ((Y_position < 0) && (X_position == 0))
+							if ((X_position == 0) && (Y_position == 0))
 							{
 								Y_position = MAX_LCD_COL;
-								LCD_setCursorPosAsync(X_position + 1, Y_position);
+								X_position =1;
+								LCD_setCursorPosAsync(X_position , Y_position);
 							}
-							else if ((Y_position < 0) && (X_position == 1))
+							else if ((Y_position == 0) && (X_position == 1))
 							{
 								Y_position = MAX_LCD_COL;
-								LCD_setCursorPosAsync(X_position - 1, Y_position);
+								X_position =0;
+								LCD_setCursorPosAsync(X_position , Y_position);
 							}
 							else
 							{
-								LCD_setCursorPosAsync(X_position, Y_position - 1);
+								Y_position --;
+								LCD_setCursorPosAsync(X_position, Y_position );
 							}
 
 
@@ -409,14 +404,18 @@ void RecieverCallBack(void){
 						break;
 
 					case Mode:
-						Mode_Flag = ~Mode_Flag;
+						Mode_Flag = MODE_SW;//~ Mode_Flag;
+						//running =1;
 
 						break;
 
 					case Okay:
+						//Y_position = 0;
+						//X_position = 0;
+						LCD_setCursorPosAsync(X_position , Y_position);
 						Edit_flag = 0;
 						/* Not Blinking LCD */
-
+						
 						break;
 					default :
 
@@ -428,7 +427,7 @@ void RecieverCallBack(void){
 
 				break;
 			case (MODE_SW):
-				switch (UART_RecivedByte)
+				switch (UART_RecivedByte-1)
 				{
 					case Up_Start:
 						running = TRUE ;
@@ -438,7 +437,7 @@ void RecieverCallBack(void){
 						break;
 
 					case Right_Pause:
-						paused = TRUE;
+						paused ^= TRUE;
 
 						break;
 
@@ -448,8 +447,8 @@ void RecieverCallBack(void){
 						break;
 
 					case Mode:
-						Mode_Flag = ~Mode_Flag;
-
+						Mode_Flag = MODE_TIMENDATE;//~Mode_Flag;
+						running = FALSE;
 						break;
 
 					default :
@@ -464,5 +463,4 @@ void RecieverCallBack(void){
 		}
 
 	}
-	//}
 }

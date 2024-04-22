@@ -42,7 +42,7 @@
 
 typedef enum
 {
-    USART1,
+    USART1_enum,
     _UART_USED_NUM
 } uart_used;
 #endif // UART_CFG_H

@@ -17,6 +17,7 @@
 /********************************************************************************************************/
 
 #include "hal/lcd.h"
+#include <stdio.h>
 
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
@@ -43,17 +44,7 @@
 /********************************************************************************************************/
 /************************************************Types***************************************************/
 /********************************************************************************************************/
-typedef enum{
-    USER_STATE_BUSY,
-    USER_STATE_READY
-}Userstate_t;
 
-typedef enum{
-    NO_REQ,
-    WRITE_REQ,
-    CLEAR_REQ,
-    SET_POS_REQ
-}CommandType_t;
 
 typedef enum{
     POWER_ON_MODE,
@@ -70,12 +61,24 @@ typedef enum{
     LCD_OPERATIONAL
 }LCD_State_t;
 
-typedef void (*CB_fn_t)(void);
 typedef struct
 {
     uint8 linePos;
     uint8 colPos;
 }CursorPose_t;
+
+typedef enum{
+    USER_STATE_BUSY,
+    USER_STATE_READY
+}Userstate_t;
+
+typedef enum{
+    NO_REQ,
+    WRITE_REQ,
+    CLEAR_REQ,
+    SET_POS_REQ,
+    NUM_REQ
+}CommandType_t;
 
 typedef struct 
 {
@@ -86,6 +89,12 @@ typedef struct
     CursorPose_t currentPose;
 }User_Request_t;
 
+
+typedef void (*CB_fn_t)(void);
+
+
+
+
 /********************************************************************************************************/
 /************************************************Variables***********************************************/
 /********************************************************************************************************/
@@ -93,10 +102,10 @@ typedef struct
 extern const LCD_Conn_t LCD_Config;
 User_Request_t User_Req;
 uint8 g_useCurr_req = 0;
+CursorPose_t g_currPos;
 static LCD_Mode_t g_LCD_initMode = POWER_ON_MODE;
 static LCD_State_t g_LCD_State = LCD_OFF;
 static uint8 g_LCD_enablePin = ENABLE_PIN_LOW;
-
 /********************************************************************************************************/
 /*****************************************Static Functions Prototype*************************************/
 /********************************************************************************************************/
@@ -107,6 +116,7 @@ static void LCD_writeProcess();
 static void LCD_clearProcess();
 static void LCD_setPose_Process();
 static void LCD_WriteCommand(uint8 command);
+static void LCD_writeNumber_Process(); 
 
 
 /********************************************************************************************************/
@@ -165,7 +175,9 @@ void LCD_Runnable()
                 break;  
             case SET_POS_REQ:
                 LCD_setPose_Process();
-                break;                         
+                break;  
+            case NUM_REQ:
+                LCD_writeNumber_Process();                       
             default:
                 break;
             }
@@ -276,7 +288,23 @@ void LCD_writeStringAsync(const uint8* string,uint8 length){
         User_Req.type = WRITE_REQ;
     }
 }
+void LCD_writeNumberAsync(uint32 Number)
+{
+    static char NumbersBuffer[16] = "";
+    //uint8 counter = 0;
+    volatile uint8 idx;
 
+    if (User_Req.state== USER_STATE_READY && g_LCD_State == LCD_OPERATIONAL)
+    {
+        User_Req.state= USER_STATE_BUSY ;
+        User_Req.type = NUM_REQ;
+        sprintf((char*)NumbersBuffer, "%u", Number); 
+        for(idx = 0; NumbersBuffer[idx] != '\0'; idx++);
+        User_Req.len = idx;  
+        User_Req.name = (const uint8*)NumbersBuffer;
+    }
+
+}
 void LCD_setCursorPosAsync(uint8 posX, uint8 posY){
 
     if ((User_Req.state == USER_STATE_READY) && (g_LCD_State == LCD_OPERATIONAL))
@@ -302,17 +330,54 @@ uint8 LCD_getStatus(void){
 
 static void LCD_writeProcess(){
 
-    if (User_Req.currentPose.colPos != User_Req.len)
+    //curr = 2 length 1 sum = 3 
+    //
+    static uint8 firsttime = 0;
+    if (firsttime == 0)
     {
-        LCD_WriteData(User_Req.name[User_Req.currentPose.colPos]);
-        User_Req.currentPose.colPos++;
+        g_currPos.colPos = 0;
+        firsttime = 1;
     }
-    else
+    else 
     {
-        User_Req.state = USER_STATE_READY;
-        User_Req.type = NO_REQ;
+        if (g_currPos.colPos != User_Req.len)
+        {
+            LCD_WriteData(User_Req.name[g_currPos.colPos]);
+            g_currPos.colPos++;
+            User_Req.currentPose.colPos++;
+        }
+        else
+        {
+            User_Req.state = USER_STATE_READY;
+            User_Req.type = NO_REQ;
+            firsttime = 0;
+        }
     }
-
+ 
+}
+void LCD_writeNumber_Process()
+{
+    static uint8 firsttime = 0;
+    if (firsttime == 0)
+    {
+        g_currPos.colPos = 0;
+        firsttime = 1;
+    }
+    else 
+    {
+        if (g_currPos.colPos != User_Req.len)
+        {
+            LCD_WriteData(User_Req.name[g_currPos.colPos]);
+            g_currPos.colPos++;
+            User_Req.currentPose.colPos++;
+        }
+        else
+        {
+            User_Req.state = USER_STATE_READY;
+            User_Req.type = NO_REQ;
+            firsttime = 0;
+        }
+    } 
 }
 static void LCD_clearProcess(){
     LCD_WriteCommand(LCD_CLEAR_COMMAND);

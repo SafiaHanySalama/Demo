@@ -69,6 +69,7 @@ void LCD_clearScreenAsynch(void);
 uint8 LCD_getStatus(void);
 
 void LCD_initAsync();
+void LCD_writeNumberAsync(uint32 Number);
 
 
 #endif // HAL_LCD_H_

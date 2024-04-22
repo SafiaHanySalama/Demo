@@ -18,6 +18,8 @@
 /********************************************************************************************************/
 
 #include "app/runnables.h"
+
+
 /********************************************************************************************************/
 /************************************************Defines*************************************************/
 /********************************************************************************************************/
@@ -56,11 +58,11 @@ void Runnable_LED_Toggle()
 {
    // led_toggle(led_red);
 }
-/*
+
 void Runnable_LED_SW(void)
 {
     SWITCH_State_t sw_state;
-    sw_state = SWITCH_Getstatus(SWITCH1);
+    sw_state = SWITCH_Getstatus(Up_Start);
     if (sw_state == BRESSED)
     {
         //led_setState(led_green,led_state_on);
@@ -69,7 +71,6 @@ void Runnable_LED_SW(void)
         //led_setState(led_green,led_state_off);
     }
 }
-*/
 void Runnable_LED_StateMachine(void)
 {
     static uint8 light_state = LED_RED;

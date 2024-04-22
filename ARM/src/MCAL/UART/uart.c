@@ -116,8 +116,8 @@ typedef enum
 /********************************************************************************************************/
 
 extern const uart_config_t usart_config[_UART_USED_NUM];
-/*static*/ tx_req TxReq;
-/*static*/volatile rx_req RxReq;
+static tx_req TxReq;
+static rx_req RxReq;
 volatile void *const uart_base_address[UART_NUM_IN_TARGET] = {
     (void *)USART1_BASE_ADDRESS,
     (void *)USART2_BASE_ADDRESS,
@@ -228,8 +228,8 @@ void USART_RxBufferAsyncZeroCopy(UART_UserReq_t *Ptr_UserReq)
         RxReq.rx_cbf = Ptr_UserReq->cbf;
         RxReq.status = USART_BUSY;
     }
-    ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
-    ((uart_t *)uart)->USART_CR1 |= UART_RXNE_FLAG;
+     ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
+     ((uart_t *)uart)->USART_CR1 |= UART_RXNE_FLAG;
 }
 
 /**
@@ -263,6 +263,7 @@ void UART_sendByte(UART_UserReq_t *Ptr_UserReq)
             //debugging
         }
         TxReq.status = USART_READY;
+
     }
 
 }
@@ -282,15 +283,12 @@ void UART_receiveByte(UART_UserReq_t *Ptr_UserReq)
         volatile uint32 timeout = 1000;
         RxReq.status = USART_BUSY;
         ((uart_t *)uart)->USART_CR1 |= UART_RX_ENABLE;
-        while (((((uart_t *)uart)->USART_SR & UART_RXNE_FLAG) != UART_RXNE_FLAG )&& timeout) ///(((uart_t *)uart)->USART_SR & UART_RXNE_FLAG) != UART_RXNE_FLAG==1
+        while (((((uart_t *)uart)->USART_SR & UART_RXNE_FLAG) == 1 )&& timeout)
         {
             timeout--;
         }
-        if(timeout != 0){
-            *Ptr_UserReq->ptr_buffer = ((uart_t *)uart)->USART_DR;
-        }
-        //*Ptr_UserReq->ptr_buffer = ((uart_t *)uart)->USART_DR;
-        //((uart_t *)uart)->USART_CR1 &= ~UART_RX_ENABLE;
+        *Ptr_UserReq->ptr_buffer = ((uart_t *)uart)->USART_DR;
+        ((uart_t *)uart)->USART_CR1 &= ~UART_RX_ENABLE;
         RxReq.status = USART_READY;
     }
 }
@@ -298,57 +296,7 @@ void UART_receiveByte(UART_UserReq_t *Ptr_UserReq)
 void USART1_IRQHandler(void)
 {
     volatile uart_t *uart = (uart_t *)uart_base_address[0];
-    /*
-    // Check if UART TX empty flag is set
-    if (UART_TXE_FLAG & ((uart_t *)uart)->USART_SR)
-    {
-        // Check if there is more data to transmit
-        if (TxReq.buffer.index < TxReq.buffer.size)
-        {
-            // Transmit the next byte
-            ((uart_t *)uart)->USART_DR = TxReq.buffer.data[TxReq.buffer.index];
-            TxReq.buffer.index++;
-        }
-        else
-        {
-            // Disable UART TX empty flag and enable UART TX complete flag
-            ((uart_t *)uart)->USART_CR1 &= ~UART_TXE_FLAG;
-            ((uart_t *)uart)->USART_CR1 |= UART_TC_FLAG;
-            TxReq.status = USART_READY;
-            
-            // Call the transmit complete callback function if it is not NULL
-            if (TxReq.tx_cbf != NULL_PTR)
-            {
-                TxReq.tx_cbf();
-            }
-        }
-    }
-    
-    // Check if UART RX not empty flag is set
-    if (UART_RXNE_FLAG & uart->USART_SR)
-    {
-        // Check if there is space in the receive buffer
-        if (RxReq.buffer.index < RxReq.buffer.size)
-        {
-            // Receive the next byte
-            RxReq.buffer.data[RxReq.buffer.index] = uart->USART_DR;
-            RxReq.buffer.index++;
-        }
-        else
-        {
-            // Disable UART RX not empty flag
-            ((uart_t *)uart)->USART_CR1 &= ~UART_RXNE_FLAG;
-            RxReq.status = USART_READY;
-            
-            // Call the receive complete callback function if it is not NULL
-            if (RxReq.rx_cbf != NULL_PTR)
-            {
-                RxReq.rx_cbf();
-            }
-        }
-    }
-    */
-        if (RxReq.buffer.index < RxReq.buffer.size)
+    if (RxReq.buffer.index < RxReq.buffer.size)
         {
             RxReq.buffer.data[RxReq.buffer.index] = uart->USART_DR;
             RxReq.buffer.index++;
@@ -358,7 +306,7 @@ void USART1_IRQHandler(void)
             {
                 RxReq.rx_cbf();
             }
-        }
+    }
     
 }
 
