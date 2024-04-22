@@ -42,8 +42,10 @@ This project includes several applications that demonstrate different functional
 
 ## Authors
 
-[Your Name]
-[Your Contact Info]
+Safia Hany Salama
+Shereen Reda
+Alaa Ahmed
+Rana Ali
 
 ## Version History
 
