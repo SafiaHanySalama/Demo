@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+
+message SwitchStatusResponse {
+    string switch_state = 1;
+}
+
+message LedControlRequest {
+    string led_state = 2;
+}
+
